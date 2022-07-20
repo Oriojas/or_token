@@ -23,5 +23,5 @@ npm install @openzeppelin/contracts-upgradeable
 
 Test contract
 ```shell
-npx hasrdhat test
+npx hardhat test
 ```

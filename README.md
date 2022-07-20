@@ -13,8 +13,15 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
-For install opendseppelin contracts is
+
+Install openzeppelin contracts is
 
 ```shell
 npm install @openzeppelin/contracts
+npm install @openzeppelin/contracts-upgradeable
+```
+
+Test contract
+```shell
+npx hasrdhat test
 ```

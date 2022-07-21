@@ -48,52 +48,54 @@ describe("OriojasTokenV1 token tests", function() {
   });
 
   
-  // describe("V2 tests", function () {
-  //   before(async function () {
+  describe("V2 tests", function () {
+    before(async function () {
 
-  //     userAccount = (await ethers.getSigners())[1];
+      userAccount = (await ethers.getSigners())[1];
 
-  //     const OriojasTokenV2 = await ethers.getContractFactory("OriojasTokenV2");
+      const OriojasTokenV2 = await ethers.getContractFactory("OriojasTokenV2");
 
-  //     oriojasTokenV2 = await upgrades.upgradeProxy(oriojasTokenV1.address, OriojasTokenV2);
+      // esta funcion reconoce que no se debe hacer un depsliegue nuevo
+      oriojasTokenV2 = await upgrades.upgradeProxy(oriojasTokenV1.address, OriojasTokenV2);
 
 
-  //     await oriojasTokenV2.deployed();
+      await oriojasTokenV2.deployed();
 
-  //   });
+    });
 
-  //   it("Should has the same address, and keep the state as the previous version", async function () {
-  //     const [totalSupplyForNewCongtractVersion, totalSupplyForPreviousVersion] = await Promise.all([
-  //       oriojasTokenV2.totalSupply(),
-  //       oriojasTokenV1.totalSupply(),
-  //     ]);
-  //     expect(oriojasTokenV1.address).to.be.equal(oriojasTokenV2.address);
-  //     expect(totalSupplyForNewCongtractVersion.eq(totalSupplyForPreviousVersion)).to.be.equal(true);
-  //   });
+    it("Should has the same address, and keep the state as the previous version", async function () {
+      const [totalSupplyForNewCongtractVersion, totalSupplyForPreviousVersion] = await Promise.all([
+        oriojasTokenV2.totalSupply(),
+        oriojasTokenV1.totalSupply(),
+      ]);
+      expect(oriojasTokenV1.address).to.be.equal(oriojasTokenV2.address);
+      expect(totalSupplyForNewCongtractVersion.eq(totalSupplyForPreviousVersion)).to.be.equal(true);
+    });
 
-  //   it("Should revert when an account other than the owner is trying to mint tokens", async function() {
-  //     const tmpContractRef = await oriojasTokenV2.connect(userAccount);
-  //     try {
-  //       await tmpContractRef.mint(userAccount.address, ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18)));
-  //     } catch (ex) {
-  //       expect(ex.message).to.contain("reverted");
-  //       expect(ex.message).to.contain("Ownable: caller is not the owner");
-  //     }
-  //   });
+    // esta prueba valida que desde otra cuenta no se pueda modificar el contrato
+    it("Should revert when an account other than the owner is trying to mint tokens", async function() {
+      const tmpContractRef = await oriojasTokenV2.connect(userAccount);
+      try {
+        await tmpContractRef.mint(userAccount.address, ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18)));
+      } catch (ex) {
+        expect(ex.message).to.contain("reverted");
+        expect(ex.message).to.contain("Ownable: caller is not the owner");
+      }
+    });
 
-  //   it("Should mint tokens when the owner is executing the mint function", async function () {
-  //     const amountToMint = ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18)).mul(ethers.BigNumber.from(10));
-  //     const accountAmountBeforeMint = await oriojasTokenV2.balanceOf(deployer.address);
-  //     const totalSupplyBeforeMint = await oriojasTokenV2.totalSupply();
-  //     await oriojasTokenV2.mint(deployer.address, amountToMint);
+    it("Should mint tokens when the owner is executing the mint function", async function () {
+      const amountToMint = ethers.BigNumber.from(10).pow(ethers.BigNumber.from(18)).mul(ethers.BigNumber.from(10));
+      const accountAmountBeforeMint = await oriojasTokenV2.balanceOf(deployer.address);
+      const totalSupplyBeforeMint = await oriojasTokenV2.totalSupply();
+      await oriojasTokenV2.mint(deployer.address, amountToMint);
 
-  //     const newAccountAmount = await oriojasTokenV2.balanceOf(deployer.address);
-  //     const newTotalSupply = await oriojasTokenV2.totalSupply();
+      const newAccountAmount = await oriojasTokenV2.balanceOf(deployer.address);
+      const newTotalSupply = await oriojasTokenV2.totalSupply();
       
-  //     expect(newAccountAmount.eq(accountAmountBeforeMint.add(amountToMint))).to.be.true;
-  //     expect(newTotalSupply.eq(totalSupplyBeforeMint.add(amountToMint))).to.be.true;
-  //   });
-  // });
+      expect(newAccountAmount.eq(accountAmountBeforeMint.add(amountToMint))).to.be.true;
+      expect(newTotalSupply.eq(totalSupplyBeforeMint.add(amountToMint))).to.be.true;
+    });
+  });
 
 
 });
